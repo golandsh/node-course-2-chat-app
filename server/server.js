@@ -47,15 +47,17 @@ io.on('connection', (socket) => {
     var user = users.getUser(socket.id);
 
     if (user) {
-      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));  
+      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.latitude, coords.longitude));
     }
   });
 
   socket.on('disconnect', () => {
     var user = users.removeUser(socket.id);
 
-    io.to(user.room).emit('updateUserList', users.getUserList(user.room));
-    io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`));
+    if (user) {
+      io.to(user.room).emit('updateUserList', users.getUserList(user.room));
+      io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`));
+    }
   });
 });
 
